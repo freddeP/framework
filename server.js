@@ -4,8 +4,7 @@ const app = require("./app");
 
 
 app.get("/", (req,res)=>{
-    
-    res.end("Home Page method: "+ req.url);
+    res.end("Home Page method... "+ req.url);
 });
 
 app.get("/test", (req,res)=>{
