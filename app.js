@@ -23,7 +23,7 @@ module.exports = {
 
     
         if(this.routes[req.method][req.url.toLowerCase()])
-        this.routes[req.method][req.url.toLowerCase()](req,res);
+        return this.routes[req.method][req.url.toLowerCase()](req,res);
         else if(this.routes.param)
         {
             let possibleRoutes = this.getPossibleRoutes(req.url.toLowerCase());
@@ -32,23 +32,22 @@ module.exports = {
             if(this.routes.param[route])
             {
                 let params = this.getParams(req.url, route);
-                req.params = params;
+                
                 let orgPath = this.routes.param[route][1];
                 // Skicka denna och skapa objekt på orden efter :
                 // bygg sedan ihop denna med params i rätt ordning..
-
-                this.routes.param[route][0](req,res);
-            }
-            
-            else res.end("404 params");
+                req.params =  this.getParamsAsObject(params, orgPath);
+                if(!req.params) res.end("404 number of params");
+                return this.routes.param[route][0](req,res);
+            }            
+            else  return res.end("404");
         }
         else if(this.routes[req.method]['/*'])
-        this.routes[req.method]['/*'](req,res);
+            return this.routes[req.method]['/*'](req,res);
         else 
         res.end("404");
     },
     show: function(){
-
         console.log(this.routes);
     },
 
@@ -56,14 +55,13 @@ module.exports = {
     getParams : function(url, route){
 
             let arr = (url.split(route)[1]).split("/");
-            console.log(url);
+        /*     console.log(url);
             console.log(route);
-            console.log(arr);
+            console.log(arr); */
             
-  
             let params = arr.filter(item => item);
 
-            console.log(params);
+            //console.log(params);
             return params;
     },
     
@@ -79,13 +77,23 @@ module.exports = {
     } ,
     getPossibleRoutes : function(path)
     {
-            
+        /**
+         * Denna funktion tar in hel path.
+         * Skalar av en efter en och kollar om det finns en path.
+         * Vi går från lång till kort alltså.
+         * En rekursiv funktion används för att successivt ta bort slutet på path-arrayen.
+         */
+        
+
+       
         let pathArr = path.split("/");
+         // ta bort första tomma elementet
         pathArr.shift();
-        //console.log(pathArr);
+        
 
         // lägg till slash på första elementet.
-        pathArr[0] = "/"+pathArr[0]
+        pathArr[0] = "/"+pathArr[0];
+
         let paths = [];
         getAllPaths(pathArr);
         //console.log("paths:",paths);
@@ -107,13 +115,25 @@ module.exports = {
     },
 
     findParamRoute : function(possibleRoutes){
-
-
+    
         let route = possibleRoutes.find(r=>{
             return this.routes.param[r];
         });
         if(route) return route;
         else return false;
+
+    },
+    getParamsAsObject: function(params, orgPath){
+
+        paramKeys = orgPath.split("/:");
+        paramKeys.shift();
+        if(params.length!= paramKeys.length) return false
+
+        let paramsObject = {}
+        paramKeys.forEach((param, i)=>{
+            paramsObject[param] = params[i];
+        });
+        return paramsObject;
 
     }
 

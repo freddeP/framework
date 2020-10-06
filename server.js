@@ -16,7 +16,7 @@ app.get("/test/:id", (req,res)=>{
     res.end("param test callback..."+ JSON.stringify(req.params));
 });
 
-app.get("/test/hello/:id", (req,res)=>{
+app.get("/test/hello/:id/:name", (req,res)=>{
     res.end("param test/hello callback..."+ JSON.stringify(req.params));
 });
 
