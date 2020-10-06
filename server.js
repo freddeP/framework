@@ -9,7 +9,7 @@ app.get("/", (req,res)=>{
 });
 
 app.get("/test", (req,res)=>{
-    res.end("from test callback");
+    res.end("from test callback"+ JSON.stringify(req.query));
 });
 
 app.get("/test/:id", (req,res)=>{

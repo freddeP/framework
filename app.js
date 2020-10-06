@@ -1,3 +1,4 @@
+const qs = require('querystring');
 
 module.exports = {
     routes : {GET:{}, POST:{}, param:{}},
@@ -21,7 +22,11 @@ module.exports = {
 
     run: function(req,res){
 
-    
+        // fixa querysstring ?id=bengt o s v...
+        let query = this.getQueryString(req.url);
+        req.query = query;
+        //ta bort query från url för vidare behandlning.
+        req.url = ((req.url).split("?"))[0]
         if(this.routes[req.method][req.url.toLowerCase()])
         return this.routes[req.method][req.url.toLowerCase()](req,res);
         else if(this.routes.param)
@@ -134,6 +139,11 @@ module.exports = {
             paramsObject[param] = params[i];
         });
         return paramsObject;
+
+    },
+    getQueryString(path){
+        path = (path.split("?"))[1];
+        return qs.parse(path);
 
     }
 
