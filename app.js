@@ -27,14 +27,13 @@ module.exports = {
         req.query = query;
         //ta bort query från url för vidare behandlning.
         req.url = ((req.url).split("?"))[0]
-        if(this.routes[req.method][req.url.toLowerCase()])
-        return this.routes[req.method][req.url.toLowerCase()](req,res);
-        else if(this.routes.param)
-        {
+        
+      
             let possibleRoutes = this.getPossibleRoutes(req.url.toLowerCase());
             let route = this.findParamRoute(possibleRoutes);
-     
-            if(this.routes.param[route])
+            if(this.routes[req.method][req.url.toLowerCase()])
+            return this.routes[req.method][req.url.toLowerCase()](req,res);
+            else if(this.routes.param[route])
             {
                 let params = this.getParams(req.url, route);
                 
@@ -44,9 +43,8 @@ module.exports = {
                 req.params =  this.getParamsAsObject(params, orgPath);
                 if(!req.params) res.end("404 number of params");
                 return this.routes.param[route][0](req,res);
-            }            
-            else  return res.end("404");
-        }
+            }
+     
         else if(this.routes[req.method]['/*'])
             return this.routes[req.method]['/*'](req,res);
         else 

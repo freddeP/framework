@@ -7,20 +7,21 @@ let functions = [];
 function next(){
     let nextRun = functions[0];
     functions.shift();
-    nextRun();
+    nextRun(next);
 }
 
 function initMiddleware(arg){
     let arr = [...arg]
     arr.shift();
     functions = [...arr];
+    next();
 }
 
 
-function test(path)
+function test()
 {
     initMiddleware(arguments);
-    next();
+  
 }
 
 
@@ -32,15 +33,15 @@ test("/path", foo, bar, bla, function(){
 
 
 
-function foo(){
+function foo(n){
     console.log("foo");
-    next();
+    n();
 }
-function bar(){
+function bar(n){
     console.log("bar");
-    next();
+    n();
 }
-function bla(){
+function bla(n){
     console.log("bla");
-    next();
+    n();
 }
